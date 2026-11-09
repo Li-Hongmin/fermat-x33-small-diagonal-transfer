@@ -1,0 +1,29 @@
+q=331
+irreducible=1
+root-ratio factor degrees=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 16, 24, 24, 24, 24, 32, 32, 32, 32]
+cyclotomic factor orders=[1]
+subfield counts by degree 1..16=[1, 3, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1]
+quartic count=1
+quartic field discriminant=1089
+quartic isomorphic to E=1
+octic count=1
+octic field discriminant=149054567751320164509892912893
+full field discriminant=22217264167532893163263700294442214796403731522508485629449
+
+q=661
+irreducible=1
+root-ratio factor degrees=[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 16, 24, 24, 24, 24, 32, 32, 32, 32]
+cyclotomic factor orders=[1]
+subfield counts by degree 1..16=[1, 3, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1]
+quartic count=1
+quartic field discriminant=1089
+quartic isomorphic to E=1
+octic count=1
+octic field discriminant=15192123183628797467149990971696
+full field discriminant=230800606826551588645597503813381240831909124279654310273116416
+
+common E-compatible subfield degrees 8 and 16 excluded by discriminants
+status: End^0_Qbar(B8) = E, using good-reduction specialization
+q=331: Frobenius on W_E(B8)(2) has characteristic polynomial (T^2+T+1)^2
+q=661: Frobenius on W_E(B8)(2) has characteristic polynomial (T^2-T+1)^2
+minimal residue degrees fixing W_E(B8)(2): 3 at q=331; 6 at q=661

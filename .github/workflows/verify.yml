@@ -1,0 +1,108 @@
+name: verify
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Python dependencies
+        run: pip install sympy==1.14.0
+      - name: Install system packages
+        run: sudo apt-get update && sudo apt-get install -y pari-gp
+      - name: Prepare a fresh working copy
+        run: cp -r verification work
+      - name: "Transfer arithmetic"
+        working-directory: work
+        env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+        run: |
+          set -eo pipefail
+          python calculations/bundles/fermat-x33-transfer-certificate/verify_transfer_arithmetic.py
+      - name: "Abel-Fourier sign"
+        working-directory: work
+        env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+        run: |
+          set -eo pipefail
+          python calculations/bundles/fermat-x33-transfer-certificate/verify_abel_fourier_sign.py
+      - name: "Abel-Fourier exterior normalization"
+        working-directory: work
+        env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+        run: |
+          set -eo pipefail
+          python calculations/bundles/fermat-x33-transfer-certificate/verify_abel_fourier_exterior_normalization.py
+      - name: "Common quotient definition field"
+        working-directory: work
+        env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+        run: |
+          set -eo pipefail
+          python calculations/bundles/fermat-x33-transfer-certificate/verify_common_quotient_definition_field.py
+      - name: "Common quotient coordinates"
+        working-directory: work
+        env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+        run: |
+          set -eo pipefail
+          python calculations/bundles/fermat-x33-transfer-certificate/verify_common_quotient_coordinates.py
+      - name: "Klein cubic character map"
+        working-directory: work
+        env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+        run: |
+          set -eo pipefail
+          python calculations/bundles/fermat-x33-transfer-certificate/verify_klein_cubic_character_map.py
+      - name: "Source projector representation"
+        working-directory: work
+        env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+        run: |
+          set -eo pipefail
+          python calculations/bundles/fermat-x33-transfer-certificate/verify_source_projector_representation.py
+      - name: "Q* character block"
+        working-directory: work
+        env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+        run: |
+          set -eo pipefail
+          python calculations/bundles/fermat-x33-transfer-certificate/verify_qstar_character_block.py
+      - name: "Order-5 cyclic cover"
+        working-directory: work
+        env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+        run: |
+          set -eo pipefail
+          python calculations/bundles/fermat-x33-order5-cyclic-cover/x33-order5-cyclic-cover.py
+      - name: "Explicit separator for the quartic-CM projector"
+        working-directory: work
+        env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+        run: |
+          set -eo pipefail
+          python calculations/bundles/x33-quartic-cm-projector/verify_explicit_separator.py
+      - name: "Level-66 Aoki bridge"
+        working-directory: work
+        env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+        run: |
+          set -eo pipefail
+          python calculations/bundles/fermat-x33-level66-aoki/verify_level66_aoki_bridge.py
+      - name: "PARI/GP: irreducibility, root ratios, subfields, discriminants"
+        working-directory: work
+        env: {OPENBLAS_NUM_THREADS: '1', OMP_NUM_THREADS: '1'}
+        run: |
+          set -eo pipefail
+          gp -q calculations/bundles/fermat-x33-frobenius-cm-screen/verify-b8-end-field.gp < /dev/null
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-output
+          path: work/
+          retention-days: 14
+  sage:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare a fresh working copy
+        run: cp -r verification work && chmod -R a+rwX work
+      - name: SageMath computations
+        run: |
+          docker run --rm -v "$PWD/work:/w" -w /w --entrypoint bash sagemath/sagemath:latest -lc "set -eo pipefail; echo '== SageMath: Frobenius polynomials at q = 331, 661' && sage -python calculations/bundles/fermat-x33-frobenius-cm-screen/x33-b-frobenius-cm-screen.py"
